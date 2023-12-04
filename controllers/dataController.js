@@ -40,8 +40,6 @@ exports.createData = catchAsync(async (req, res, next) => {
 
 exports.deleteData = catchAsync(async (req, res, next) => {
 	const data = await Data.deleteOne({ _id: req.params.id });
-	// console.log(task);
-	// console.log(task._id);
 	if (!data.deletedCount) {
 		return next(new AppError('No data found with that ID', 404));
 	}
