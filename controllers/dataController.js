@@ -1,34 +1,31 @@
 const Data = require('../models/dataModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
-const APIFeatures = require('./../utils/apiFeatures');
+// const APIFeatures = require('./../utils/apiFeatures');
 
 exports.getAllData = catchAsync(async (req, res, next) => {
-	const features = new APIFeatures(Data.find(), req.query).filter().sort();
-	const data = await features.query;
-
-	res.status(200).json({
-		status: 'success',
-		result: data.length,
-		data: {
-			data,
-		},
+	Data.getAllData(req.query, (err, result) => {
+		if (err) throw err;
+		res.status(200).json({
+			status: 'success',
+			result: Object.keys(result).length,
+			data: result,
+		});
 	});
 });
 exports.getData = catchAsync(async (req, res, next) => {
-	const data = await Data.findById(req.params.id);
-	if (!data) {
-		return next(new AppError('No data found with that ID', 404));
-	}
-	res.status(200).json({
-		status: 'success',
-		data: {
-			data,
-		},
+	Data.getDataById(req.params.id, (err, result) => {
+		if (err || !result || Object.keys(result).length === 0) {
+			return next(new AppError('No data found with that ID', 404));
+		}
+		res.status(200).json({
+			status: 'success',
+			data: result,
+		});
 	});
 });
 exports.createData = catchAsync(async (req, res, next) => {
-	const newData = await Data.create(req.body);
+	const newData = await Data.createData(req.body);
 
 	res.status(201).json({
 		status: 'success',
@@ -39,14 +36,17 @@ exports.createData = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteData = catchAsync(async (req, res, next) => {
-	const data = await Data.deleteOne({ _id: req.params.id });
-	// console.log(task);
-	// console.log(task._id);
-	if (!data.deletedCount) {
-		return next(new AppError('No data found with that ID', 404));
-	}
-	res.status(200).json({
-		status: 'success',
-		message: 'The data has been deleted successfully',
+	Data.deleteData(req.params.id, (err, result) => {
+		if (err) {
+			return next(new AppError('Something when wrong!', 404));
+		}
+		console.log(result.affectedRows);
+		if (!result.affectedRows) {
+			return next(new AppError('No data found with that ID', 404));
+		}
+		res.status(200).json({
+			status: 'success',
+			message: 'The data has been deleted successfully'
+		});
 	});
 });

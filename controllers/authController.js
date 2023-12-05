@@ -13,7 +13,7 @@ const signToken = (id) => {
 };
 
 const createSendToken = (user, statusCode, res) => {
-	const token = signToken(user._id);
+	const token = signToken(user.id);
 	user.password = undefined;
 
 	res.status(statusCode).json({
@@ -26,22 +26,26 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-	const newUser = await User.create(req.body);
+	const newUser = await User.createUser(req.body);
+	console.log('New User', newUser);
 	createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
-	const { email, password } = req.body;
-	if (!email || !password) {
-		next(new AppError('Please provide email and password!', 400));
-	}
-	const user = await User.findOne({ email }).select('+password');
+    const { email, password } = req.body;
+    if (!email || !password) {
+        next(new AppError('Please provide email and password!', 400));
+    }
 
-	if (!user || !(await user.correctPassword(password, user.password))) {
-		return next(new AppError('Incorrect email or password', 401));
-	}
-	createSendToken(user, 200, res);
+    // Use the findOneUser function to get the user
+    const user = await User.findOneUser(email);
+
+    if (!user || !(await User.correctPassword(password, user.password))) {
+        return next(new AppError('Incorrect email or password', 401));
+    }
+    createSendToken(user, 200, res);
 });
+
 
 exports.protect = catchAsync(async (req, res, next) => {
 	let token;
@@ -66,7 +70,8 @@ exports.protect = catchAsync(async (req, res, next) => {
 			)
 		);
 	}
-	if (freshUser.changePasswordAfter(decoded.iat)) {
+	const isChangePassword = User.changePasswordAfter(freshUser, decoded.iat)
+	if (!isChangePassword) {
 		return next(
 			new AppError('User recently changed password! Please log in again.', 401)
 		);
@@ -141,15 +146,19 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
 	console.log(req);
-	const user = await User.findById(req.user.id).select('+password');
-
-	if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+	const user = await User.findById(req.user.id);
+	// console.log(user);
+	if (!(await User.correctPassword(req.body.passwordCurrent, user.password))) {
 		return next(new AppError('Your current password is wrong.', 401));
 	}
-
+	if(req.body.password != req.body.passwordConfirm) {
+		return next(new AppError('Your password and password confirm do not match.', 401));
+	}
 	user.password = req.body.password;
-	user.passwordConfirm = req.body.passwordConfirm;
-	await user.save();
+
+	// await user.save();
+	await User.findByIdAndUpdate(req.user.id, user);
+
 
 	createSendToken(user, 200, res);
 });

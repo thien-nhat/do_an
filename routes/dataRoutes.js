@@ -7,22 +7,20 @@ const router = express.Router();
 router
 	.route('/')
 	.get(
-		// authController.protect,
-		authController.restrictTo('admin'),
+		authController.protect,
 		dataController.getAllData
 	)
 	.post(
-		// authController.protect,
+		authController.protect,
 		authController.restrictTo('admin'),
 		dataController.createData
 	);
 router
 	.route('/:id')
 	.get(
-		// authController.protect, 
 		dataController.getData)
 	.delete(
-		// authController.protect,
+		authController.protect,
 		authController.restrictTo('admin'),
 		dataController.deleteData
 	);

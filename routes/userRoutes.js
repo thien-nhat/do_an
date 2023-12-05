@@ -7,8 +7,8 @@ const router = express.Router();
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
 
-router.post('/forgotPassword', authController.forgotPassword);
-router.patch('/resetPassword/:token', authController.resetPassword);
+// router.post('/forgotPassword', authController.forgotPassword);
+// router.patch('/resetPassword/:token', authController.resetPassword);
 
 router.patch(
 	'/updateMyPassword',
@@ -28,27 +28,29 @@ router.patch(
 	userController.updateUser
 );
 
-router.route('/').get(
-	// authController.protect,
-	// authController.restrictTo('backOffice'),
-	userController.getAllUsers
-);
+router
+	.route('/')
+	.get(
+		authController.protect,
+		authController.restrictTo('admin'),
+		userController.getAllUsers
+	);
 
 router
 	.route('/:id')
 	.get(
-		// authController.protect,
-		// authController.restrictTo('backOffice'),
+		authController.protect,
+		authController.restrictTo('admin'),
 		userController.getUser
 	)
 	.patch(
-		// authController.protect,
-		// authController.restrictTo('backOffice'),
+		authController.protect,
+		authController.restrictTo('admin'),
 		userController.updateUser
 	)
 	.delete(
-		// authController.protect,
-		// authController.restrictTo('backOffice'),
+		authController.protect,
+		authController.restrictTo('admin'),
 		userController.deleteUser
 	);
 
