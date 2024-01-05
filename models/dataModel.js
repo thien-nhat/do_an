@@ -1,12 +1,12 @@
 const db = require('../database/database');
 
 exports.getAllData = (queryString, callback) => {
-	let sql = 'SELECT * FROM data';
+	let sql = 'SELECT * FROM data WHERE temperature != 0 AND humidity != 0 AND soilMoisture != 0';
 	let params = [];
 
 	// Filter by date range
 	if (queryString.start && queryString.end) {
-		sql += ' WHERE createdAt >= ? AND createdAt < ?';
+		sql += ' WHERE ts >= ? AND ts < ?';
 		params.push(new Date(queryString.start), new Date(queryString.end));
 	}
 	// Filter by specific date
@@ -14,7 +14,7 @@ exports.getAllData = (queryString, callback) => {
 		let startDate = new Date(queryString.on);
 		let endDate = new Date(queryString.on);
 		endDate.setDate(endDate.getDate() + 1);
-		sql += ' WHERE createdAt >= ? AND createdAt < ?';
+		sql += ' WHERE ts >= ? AND ts < ?';
 		params.push(startDate, endDate);
 	}
 
@@ -23,7 +23,7 @@ exports.getAllData = (queryString, callback) => {
 		const sortBy = queryString.sort.split(',').join(' ');
 		sql += ' ORDER BY ' + sortBy;
 	} else {
-		sql += ' ORDER BY createdAt DESC';
+		sql += ' ORDER BY ts DESC';
 	}
 	db.query(sql, params, callback);
 };

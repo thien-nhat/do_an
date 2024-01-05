@@ -48,9 +48,4 @@ Once the app is running, you can use any RESTful client (e.g. Postman, Insomnia)
 `PATCH api/tasks/:id`: Updates an existing user.\
 `DELETE /users/:id`: Deletes a user.
 
-2. Tasks:\
-`GET api/tasks`: Returns a list of all tasks.\
-`GET api/tasks/:id`: Returns a single task by ID.\
-`POST api/tasks`: Creates a new task.\
-`PATCH api/tasks/:id`: Updates an existing task.\
-`DELETE api/tasks/:id`: Deletes a task.
+2. Data:\

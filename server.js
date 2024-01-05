@@ -1,5 +1,5 @@
 const dotenv = require('dotenv');
-const sendLongPollingRequest = require('./handle/handle');
+const sendLongPollingRequest = require('./handle/sendLongPollingRequest');
 
 dotenv.config({
 	path: './config.env',
@@ -12,4 +12,5 @@ const port = process.env.PORT || 5000;
 app.listen(port, () => {
 	console.log(`app running on port ${port}....`);
 });
-sendLongPollingRequest();
+
+// sendLongPollingRequest();

@@ -3,11 +3,20 @@ const dataController = require('../controllers/dataController');
 const authController = require('../controllers/authController');
 
 const router = express.Router();
-
+router.post(
+	'/postmissedrequest',
+	// authController.protect,
+	dataController.postMissedRequest
+);
+router.get(
+	'/predictplantgrowth',
+	// authController.protect,
+	dataController.predictPlantGrowth
+);
 router
 	.route('/')
 	.get(
-		authController.protect,
+		// authController.protect,
 		dataController.getAllData
 	)
 	.post(
@@ -17,12 +26,12 @@ router
 	);
 router
 	.route('/:id')
-	.get(
-		dataController.getData)
+	.get(dataController.getData)
 	.delete(
 		authController.protect,
 		authController.restrictTo('admin'),
 		dataController.deleteData
 	);
+// router.route('/getmissedrequest').get();
 
 module.exports = router;
