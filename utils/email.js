@@ -9,10 +9,10 @@ const sendEmail = async (options) => {
 		},
 	});
 	const mailOptions = {
-		from: 'Nhat Thien <thien.webdev@gmail.com>',
+		from: 'SMART FARM <thien.webdev@gmail.com>',
 		to: options.email,
 		subject: options.subject,
-		text: options.message,
+		html: options.message,
 	};
 	await transporter.sendMail(mailOptions);
 };

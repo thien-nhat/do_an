@@ -1,6 +1,6 @@
 const db = require('../database/database');
 
-exports.getAllData = (queryString, callback) => {
+exports.getAllData = ( page, limit, queryString, callback) => {
 	let sql = 'SELECT * FROM data WHERE temperature != 0 AND humidity != 0 AND soilMoisture != 0';
 	let params = [];
 
@@ -25,9 +25,21 @@ exports.getAllData = (queryString, callback) => {
 	} else {
 		sql += ' ORDER BY ts DESC';
 	}
+	let offset = (page - 1) * limit;
+	sql += ' LIMIT ?, ?';
+	params.push(offset, limit);
+
 	db.query(sql, params, callback);
 };
 
+exports.getCountData = (callback) => {
+	let sql = 'SELECT COUNT(*) AS count FROM data WHERE temperature != 0 AND humidity != 0 AND soilMoisture != 0'; 
+
+	db.query(sql, (err, result) => {
+		if (err) throw err;
+		callback(null, result[0].count);
+	});
+};
 exports.getDataById = (id, callback) => {
 	const sql = 'SELECT * FROM data WHERE id = ?';
 	db.query(sql, [id], callback);
