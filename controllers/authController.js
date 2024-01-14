@@ -27,7 +27,6 @@ const createSendToken = (user, statusCode, res) => {
 
 exports.signup = catchAsync(async (req, res, next) => {
 	const newUser = await User.createUser(req.body);
-	console.log('New User', newUser);
 	createSendToken(newUser, 201, res);
 });
 
@@ -41,25 +40,25 @@ exports.login = catchAsync(async (req, res, next) => {
 	const user = await User.findByEmail(email);
 
 	if (!user || !(await User.correctPassword(password, user.password))) {
-		return next(new AppError('Incorrect email or password', 401));
+		return next(new AppError('Wrong email or password', 401));
 	}
-	const message = `
-    <h1 style="color: limegreen; font-family: Arial, sans-serif; font-weight: bold;">Welcome to Smart Farm ☘️</h1>
-    <p style="font-size: 16px; color: #000000;"><strong>Hello </strong> ${user.name},</p>
-    <p style="font-size: 14px; color: #7cfc00; font-style: italic;">Thank you for Log In for Smart Farm. We're excited to have you on board.</p>
-    <p style="font-size: 14px; color: #000000;">Best regards,<br> <br> <strong ><em style="font-size: 14px; background-color: #008000; color: white; text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);">The Smart Farm Team </em> </strong></p>
-	`;
-	try {
-		await sendEmail({
-			email: user.email,
-			subject: '[Smart Farm] Thank You For Log In',
-			message,
-		});
-	} catch (err) {
-		console.log(err);
-		return next(new AppError('There was an error sending the email!'), 500);
-	}
-	
+	// const message = `
+	// <h1 style="color: limegreen; font-family: Arial, sans-serif; font-weight: bold;">Welcome to Smart Farm ☘️</h1>
+	// <p style="font-size: 16px; color: #000000;"><strong>Hello </strong> ${user.name},</p>
+	// <p style="font-size: 14px; color: #7cfc00; font-style: italic;">Thank you for Log In for Smart Farm. We're excited to have you on board.</p>
+	// <p style="font-size: 14px; color: #000000;">Best regards,<br> <br> <strong ><em style="font-size: 14px; background-color: #008000; color: white; text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);">The Smart Farm Team </em> </strong></p>
+	// `;
+	// try {
+	// 	await sendEmail({
+	// 		email: user.email,
+	// 		subject: '[Smart Farm] Thank You For Log In',
+	// 		message,
+	// 	});
+	// } catch (err) {
+	// 	console.log(err);
+	// 	return next(new AppError('There was an error sending the email!'), 500);
+	// }
+
 	createSendToken(user, 200, res);
 });
 
@@ -133,7 +132,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 			message: 'Verify Code sent to email!',
 		});
 	} catch (err) {
-		console.log(err);
 		return next(new AppError('There was an error sending the email!'), 500);
 	}
 });
@@ -163,7 +161,6 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-	console.log(req);
 	const user = await User.findById(req.user.id);
 	if (!(await User.correctPassword(req.body.passwordCurrent, user.password))) {
 		return next(new AppError('Your current password is wrong.', 401));
@@ -175,7 +172,6 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 	}
 	user.password = req.body.password;
 
-	// await user.save();
 	await User.findByIdAndUpdate(req.user.id, user);
 
 	createSendToken(user, 200, res);

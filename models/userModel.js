@@ -11,18 +11,35 @@ exports.getUserById = (id, callback) => {
 	db.query(sql, [id], callback);
 };
 
+exports.createUser = async (user, callback) => {
+	return new Promise(async (resolve, reject) => {
+		const role = 'admin';
+		const { name, email, password, phone } = user;
+		const hashedPassword = await bcrypt.hash(password, 12);
+		console.log('Is from here');
+		const sql = `INSERT INTO users (name, email, phone, password, role) VALUES (?, ?, ?, ?, ?)`;
+		// db.query(sql, [name, email, phone, hashedPassword, role], callback);
+		db.query(sql, [name, email, phone, hashedPassword, role], (err, results) => {
+			if (err) {
+				reject(err);
+			} else {
+				user.id=results.insertId;
+				resolve(user);
+			}
+		});
+	});
+};
 
 exports.updateUser = (id, user, callback) => {
-	const { name, email, password,  role } = user;
+	const { name, email, password, role } = user;
 	const sql = `UPDATE users SET name = ?, email = ?, password = ?, role = ? WHERE id = ?`;
-	db.query(sql, [name, email, password,  role, id], callback);
+	db.query(sql, [name, email, password, role, id], callback);
 };
 
 exports.deleteUser = (id, callback) => {
 	const sql = 'DELETE FROM users WHERE id = ?';
 	db.query(sql, [id], callback);
 };
-
 
 exports.findByEmail = function (email) {
 	return new Promise((resolve, reject) => {
