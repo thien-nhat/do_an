@@ -1,6 +1,6 @@
 const Data = require('../models/dataModel');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/AppError');
+const appError = require('../utils/appError');
 const sendRequestWhenMiss = require('../handle/sendRequestWhenMiss');
 const predictPlantGrowth = require('../handle/predictPlantGrowth');
 
@@ -27,7 +27,7 @@ exports.getAllData = catchAsync(async (req, res, next) => {
 exports.getData = catchAsync(async (req, res, next) => {
 	Data.getDataById(req.params.id, (err, result) => {
 		if (err || !result || Object.keys(result).length === 0) {
-			return next(new AppError('No data found with that ID', 404));
+			return next(new appError('No data found with that ID', 404));
 		}
 		res.status(200).json({
 			status: 'success',
@@ -49,11 +49,11 @@ exports.createData = catchAsync(async (req, res, next) => {
 exports.deleteData = catchAsync(async (req, res, next) => {
 	Data.deleteData(req.params.id, (err, result) => {
 		if (err) {
-			return next(new AppError('Something when wrong!', 404));
+			return next(new appError('Something when wrong!', 404));
 		}
 		console.log(result.affectedRows);
 		if (!result.affectedRows) {
-			return next(new AppError('No data found with that ID', 404));
+			return next(new appError('No data found with that ID', 404));
 		}
 		res.status(200).json({
 			status: 'success',

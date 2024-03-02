@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 
-const AppError = require('./utils/appError');
+const appError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const userRouter = require('./routes/userRoutes');
 const dataRouter = require('./routes/dataRoutes');
@@ -18,7 +18,7 @@ app.use('/api/data', dataRouter);
 
 // Unhandled Routes
 app.all('*', (req, res, next) => {
-	next(new AppError(`Can't find ${req.originalUrl} on this server!`));
+	next(new appError(`Can't find ${req.originalUrl} on this server!`));
 });
 
 app.use(globalErrorHandler);

@@ -1,0 +1,30 @@
+services:
+  nodejsapp:
+    build: .
+    ports:
+      - 5000:5000
+    env_file:
+      - config.env
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+    depends_on:
+      mysql:
+        condition: service_healthy
+  mysql:
+    image: mysql:8.0
+    ports:
+      - 3307:3306
+    expose:
+      - 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: do_an
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 123456
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    volumes:
+      - ./do_an.sql:/docker-entrypoint-initdb.d/do_an.sql
